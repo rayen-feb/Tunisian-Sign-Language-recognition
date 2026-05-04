@@ -166,26 +166,33 @@ history = model.fit(
 # =========================
 # PLOT RESULTS
 # =========================
-plt.figure(figsize=(10,4))
+plt.figure(figsize=(10, 4))
 
+#accurancy plots 
 plt.subplot(1,2,1)
 plt.plot(history.history['accuracy'], label='Train')
 plt.plot(history.history['val_accuracy'], label='Val')
 plt.title("Accuracy")
 plt.legend()
 
+#loss plot 
 plt.subplot(1,2,2)
 plt.plot(history.history['loss'], label='Train')
 plt.plot(history.history['val_loss'], label='Val')
 plt.title("Loss")
 plt.legend()
 
+
+#save the plot
+plot_path=os.path.join(PLOTS_DIR, "training_curves.png")
+plt.savefig(plot_path, dpi=300, bbox_inches='tight')
+print(f"\n Training curves saved to: {plot_path}")
 plt.show()
 
 # =========================
 # TEST ON IMAGE
 # =========================
-TEST_IMAGE_PATH = "test.jpg"
+TEST_IMAGE_PATH = "Data/test/test_car.jpg"
 
 if os.path.exists(TEST_IMAGE_PATH):
     img = image.load_img(TEST_IMAGE_PATH, target_size=(IMG_SIZE, IMG_SIZE))
