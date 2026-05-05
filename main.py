@@ -6,6 +6,8 @@ from tensorflow.keras.preprocessing.image import ImageDataGenerator #load images
 from tensorflow.keras.applications import MobileNetV2 # pretrained cnn model
 from tensorflow.keras.preprocessing import image # load sigle test images 
 from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau, ModelCheckpoint
+from sklearn.metrics import confusion_matrix, classification_report, ConfusionMatrixDisplay
+import seaborn as sns
 
 # =========================
 # CONFIGURATION
@@ -13,7 +15,9 @@ from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau, ModelCh
 IMG_SIZE = 224  # all images resizeed to 224 224 
 BATCH_SIZE = 32 # model process 32 images at  once 
 EPOCHS = 20 #model see dataset 20 times 
-DATA_PATH = "data/raw" 
+DATA_PATH = "Data/raw"
+PLOTS_DIR = "plots"
+os.makedirs(PLOTS_DIR, exist_ok=True)
 MODEL_PATH = "models/tsl_model.h5"  # where trained model will be saved 
 
 
