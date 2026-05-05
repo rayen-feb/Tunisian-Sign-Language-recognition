@@ -30,7 +30,11 @@ train_datagen = ImageDataGenerator(
     rotation_range=20, # randomly rotate images by up to 20 degrees
     zoom_range=0.3, # randomly zoom in images by up to 30%
     horizontal_flip=True,  # randomly flip images horizontally
-    brightness_range=[0.8, 1.2] # randomly adjust brightness between 80% and 120%
+    brightness_range=[0.8, 1.2], # randomly adjust brightness between 80% and 120%
+    shear_range=0.2,
+    width_shift_range=0.2,
+    height_shift_range=0.2,
+    channel_shift_range=20.0
 )
 
 train_data = train_datagen.flow_from_directory(    #load images from directory and apply augmentation
@@ -96,8 +100,8 @@ x = tf.keras.layers.BatchNormalization()(x)
 x = tf.keras.layers.Dense(256, activation='relu')(x)
 #fully connected layer with 256 neurons and ReLU activation function
 # relu keep positive signals , remove negative noise 
-x = tf.keras.layers.Dropout(0.5)(x)
-# randomly disable  50% OF NEURONS DURING TRAINING
+x = tf.keras.layers.Dropout(0.6)(x)
+# randomly disable  60% OF NEURONS - stronger regularization
 # prevent overfitting by forcing the model to learn more robust features
 
 #second dense layer 

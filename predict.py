@@ -3,14 +3,15 @@ import numpy as np
 import matplotlib.pyplot as plt
 from tensorflow.keras.preprocessing import image
 from tensorflow.keras.models import load_model
-from tensorflow.keras.applications.mobilenet_v2 import preprocess_input  # Matches training preprocessing
+from tensorflow.keras.applications.mobilenet_v2 import preprocess_input
+from tensorflow.keras.preprocessing.image import ImageDataGenerator  # Fixed import for TTA
 
 # =========================
 # CONFIGURATION
 # =========================
 IMG_SIZE = 224
 MODEL_PATH = "models/tsl_model.h5"
-DATA_PATH = "Data/raw"  # Actual casing
+DATA_PATH = "Data/raw"
 TEST_IMAGE_PATH = "Data/test/test_car.jpg"
 
 def get_class_indices(data_path):
@@ -18,24 +19,38 @@ def get_class_indices(data_path):
     class_names = sorted([d for d in os.listdir(data_path) if os.path.isdir(os.path.join(data_path, d))])
     return {name: idx for idx, name in enumerate(class_names)}
 
-def predict_image(model, class_indices, img_path):
-    """Predict on single image, return top class + confidence."""
+def predict_image(model, class_indices, img_path, tta=False, tta_steps=16):
+    """Predict on single image with optional TTA (Test-Time Augmentation)."""
     if not os.path.exists(img_path):
         raise FileNotFoundError(f"Image not found: {img_path}")
     
-    # Load and preprocess (same as training)
     img = image.load_img(img_path, target_size=(IMG_SIZE, IMG_SIZE))
     img_array = image.img_to_array(img)
-    img_array = np.expand_dims(img_array, axis=0)
-    img_array = preprocess_input(img_array)  # MobileNetV2 specific normalization
     
-    predictions = model.predict(img_array, verbose=0)
+    if not tta:
+        img_array = np.expand_dims(img_array, axis=0)
+        img_array = preprocess_input(img_array)
+        predictions = model.predict(img_array, verbose=0)
+    else:
+        print("🔄 TTA: averaging 16 augmented predictions...")
+        predictions = np.zeros((1, len(class_indices)))
+        tta_datagen = ImageDataGenerator(
+            rotation_range=10, zoom_range=0.1, horizontal_flip=True, 
+            brightness_range=[0.9, 1.1], shear_range=0.1
+        )
+        img_array = preprocess_input(np.expand_dims(img_array, axis=0))
+        for _ in range(tta_steps):
+            aug_gen = tta_datagen.flow(img_array, batch_size=1)
+            aug_img = next(aug_gen)
+            pred = model.predict(aug_img, verbose=0)
+            predictions += pred
+        predictions /= tta_steps
+    
     predicted_class_idx = np.argmax(predictions[0])
     confidence = np.max(predictions[0])
-    
     predicted_class = [k for k, v in class_indices.items() if v == predicted_class_idx][0]
     
-    return predicted_class, confidence, img  # Return img for visualization
+    return predicted_class, confidence, img
 
 def main():
     print("🔮 Tunisian Sign Language Model Tester")
@@ -63,20 +78,24 @@ def main():
     if not img_path:
         img_path = TEST_IMAGE_PATH
     
+    # TTA option
+    use_tta = input("Use TTA for better new image accuracy? (y/n): ").strip().lower() in ['y', 'yes']
+    
     try:
-        predicted_class, confidence, img = predict_image(model, class_indices, img_path)
+        predicted_class, confidence, img = predict_image(model, class_indices, img_path, tta=use_tta)
         
         # Visualize
         plt.figure(figsize=(8, 6))
         plt.imshow(img)
-        plt.title(f"Predicted: {predicted_class}\\nConfidence: {confidence:.2%}", fontsize=16, pad=20)
+        plt.title(f"Predicted: {predicted_class}\nConfidence: {confidence:.2%}", fontsize=16, pad=20)
         plt.axis('off')
         plt.show()
         
-        print(f"\n🎯 Predicted: {predicted_class} (confidence: {confidence:.2%})")
+        print(f"\n🎯 Predicted: {predicted_class} (confidence: {confidence:.2%}) {'[TTA]' if use_tta else ''}")
         
     except Exception as e:
         print(f"❌ Error: {e}")
 
 if __name__ == "__main__":
     main()
+
