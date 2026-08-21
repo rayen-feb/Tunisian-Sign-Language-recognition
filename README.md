@@ -1,9 +1,16 @@
-# Tunisian Sign Language Recognition
+# 🤟 Tunisian Sign Language Recognition
 
-Deep learning model (MobileNetV2) for recognizing Tunisian Sign Language gestures from images.
+A deep learning project using **MobileNetV2** to recognize Tunisian Sign Language gestures from images.  
+The system integrates **MediaPipe** for hand detection, supports ~57 classes, and provides predictions as **text, confidence scores, and Arabic voice spelling** via gTTS.
+
+---
+
+## 📸 Preview
+![Sign Language Recognition Demo](https://images.unsplash.com/photo-1581090700227-4c4d1a3d5f2d?q=80&w=1170&auto=format&fit=crop)
+
+---
 
 ## 📁 Project Structure
-```
 .
 ├── Data/raw/          # Training images by class (3aslema, 3ayla, etc.)
 ├── models/            # tsl_model.h5 (trained)
@@ -15,37 +22,81 @@ Deep learning model (MobileNetV2) for recognizing Tunisian Sign Language gesture
 ├── word_map.py        # Maps labels → Arabic phrases for voice (gTTS)
 ├── requirements.txt   # Dependencies
 └── README.md          # This file
-```
+
+Code
+
+---
 
 ## 🚀 Quick Start
-1. Install: `pip install -r requirements.txt`
-2. Train: `python main.py`
-3. Test image: `python predict.py` (enter path)
-4. **Web app:** `python app_gradio.py`
+1. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
+Train the model:
 
-## 🌐 Web App (Gradio)
-Upload, drag & drop, or take a photo of a sign and get the predicted sign as **text** + confidence.
+bash
+python main.py
+Test on a single image:
 
-```bash
+bash
+python predict.py path/to/image.jpg
+Launch the Gradio web app:
+
+bash
 python app_gradio.py
-```
-Then open the local URL shown in the terminal (default: http://127.0.0.1:7860).
+Then open the local URL (default: http://127.0.0.1:7860).
 
-### Features
-- 🖐️ **Two modes:**
-  - **Single Image** — upload or webcam a sign → predicted sign as text
-  - **Sentence Prediction** — upload multiple signs → combined sentence
-- 📷 **Webcam capture** with a 3-second on-screen countdown
-- ✋ **Hand cropping** (MediaPipe) — the model focuses only on the hand for better accuracy
-- 🔊 **Voice spelling** of the predicted sign in Arabic (gTTS)
-- 📊 **Top 3 predictions** with confidence bars
-- 🖼️ Example images from `Data/test/`
+🌐 Web App (Gradio)
+Upload, drag & drop, or capture a photo of a sign to get predictions with text + confidence scores.
 
-### Hand model
-`hand_crop.py` uses MediaPipe's `HandLandmarker` which needs a `hand_landmarker.task` file in the project root. If it's missing, the app automatically falls back to a centered crop (still works, just less precise).
+Features
+🖐️ Two modes:
 
-## Classes
-Auto-detected from `Data/raw/` folders (currently ~57 signs).
+Single Image → predict one sign
 
-## 📊 Status
-See [TODO.md](TODO.md)
+Sentence Prediction → combine multiple signs
+
+📷 Webcam capture with a 3‑second countdown
+
+✋ Hand cropping via MediaPipe
+
+🔊 Voice spelling in Arabic (gTTS)
+
+📊 Top‑3 predictions with confidence bars
+
+🖼️ Example images from Data/test/
+
+🧠 Hand Model
+hand_crop.py uses MediaPipe HandLandmarker.
+If hand_landmarker.task is missing, the app falls back to a centered crop (less precise but functional).
+
+📚 Classes
+Auto‑detected from Data/raw/ folders — currently ~57 signs.
+
+📊 Status
+See [Il semble que le résultat n’était pas sûr à afficher. Changeons un peu et essayons autre chose !] for pending tasks and improvements.
+
+🔗 Links
+📂 GitHub Repository
+
+🎥 Live Demo (local): http://127.0.0.1:7860  
+(Deploy on Hugging Face Spaces or Streamlit Cloud for public access)
+
+🔮 Future Work
+Expand dataset with more Tunisian sign classes
+
+Deploy on Hugging Face Spaces for public demo
+
+Add real‑time video recognition with continuous prediction
+
+Improve accuracy with transfer learning and fine‑tuning
+
+
+---
+
+✨ This is the **full code for your README** — clean, professional, and ready to showcase.  
+Would you like me to also create a **matching portfolio HTML section** (like the Soil Fertilization one) that pulls directly from this README so your site stays consistent?
+
+---
+
+✨ This is the **full code for your README** — clean, professional, and ready to showcase.  
+Would you like me to also create a **matching portfolio HTML section** (like the So
