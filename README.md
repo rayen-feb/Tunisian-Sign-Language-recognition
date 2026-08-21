@@ -6,7 +6,7 @@ The system integrates **MediaPipe** for hand detection, supports ~57 classes, an
 ---
 
 ## 📸 Preview
-![Sign Language Recognition Demo](https://images.unsplash.com/photo-1581090700227-4c4d1a3d5f2d?q=80&w=1170&auto=format&fit=crop)
+![Sign Language Recognition Demo](https://images.unsplash.com/photo-1551240903-154be3f2e18b?q=80&w=1169&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D?q=80&w=1170&auto=format&fit=crop)
 
 ---
 
