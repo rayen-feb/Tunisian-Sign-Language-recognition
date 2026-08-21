@@ -77,10 +77,3 @@ Improve accuracy with transfer learning and fine‑tuning
 
 ---
 
-✨ This is the **full code for your README** — clean, professional, and ready to showcase.  
-Would you like me to also create a **matching portfolio HTML section** (like the Soil Fertilization one) that pulls directly from this README so your site stays consistent?
-
----
-
-✨ This is the **full code for your README** — clean, professional, and ready to showcase.  
-Would you like me to also create a **matching portfolio HTML section** (like the So
