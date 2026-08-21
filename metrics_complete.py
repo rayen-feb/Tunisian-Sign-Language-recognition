@@ -2,6 +2,7 @@ import os
 import numpy as np
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
+from tensorflow.keras.applications.mobilenet_v2 import preprocess_input  # match training pipeline
 from sklearn.metrics import confusion_matrix, classification_report
 import seaborn as sns
 import matplotlib.pyplot as plt
@@ -14,7 +15,9 @@ PLOTS_DIR = "plots"
 os.makedirs(PLOTS_DIR, exist_ok=True)
 
 model = load_model(MODEL_PATH)
-test_datagen = ImageDataGenerator(rescale=1./255, validation_split=0.1)
+# Note: validation_split negates the preprocessing_function; we apply preprocess_input manually below.
+# Use a plain generator (no rescale) so we control normalization exactly like training.
+test_datagen = ImageDataGenerator(validation_split=0.1, preprocessing_function=preprocess_input)
 test_data = test_datagen.flow_from_directory(DATA_PATH, target_size=(IMG_SIZE, IMG_SIZE), batch_size=BATCH_SIZE, class_mode='sparse', subset='training', shuffle=False)
 
 y_test = test_data.classes

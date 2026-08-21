@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from tensorflow.keras.preprocessing import image
 from tensorflow.keras.models import load_model
 from tensorflow.keras.applications.mobilenet_v2 import preprocess_input
-from tensorflow.keras.preprocessing.image import ImageDataGenerator  # Fixed import for TTA
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
 # =========================
 # CONFIGURATION
@@ -19,38 +19,35 @@ def get_class_indices(data_path):
     class_names = sorted([d for d in os.listdir(data_path) if os.path.isdir(os.path.join(data_path, d))])
     return {name: idx for idx, name in enumerate(class_names)}
 
-def predict_image(model, class_indices, img_path, tta=False, tta_steps=16):
-    """Predict on single image with optional TTA (Test-Time Augmentation)."""
+def predict_image(model, class_indices, img_path, tta=False, tta_steps=32, top_k=3):
+    """Predict on single image with optional TTA (Test-Time Augmentation) and Top-K results."""
     if not os.path.exists(img_path):
         raise FileNotFoundError(f"Image not found: {img_path}")
     
     img = image.load_img(img_path, target_size=(IMG_SIZE, IMG_SIZE))
     img_array = image.img_to_array(img)
-    
+    img_array = np.expand_dims(img_array, axis=0)
+    img_array = preprocess_input(img_array)
+
     if not tta:
-        img_array = np.expand_dims(img_array, axis=0)
-        img_array = preprocess_input(img_array)
         predictions = model.predict(img_array, verbose=0)
     else:
-        print("🔄 TTA: averaging 16 augmented predictions...")
+        print(f"🔄 TTA: averaging {tta_steps} augmented predictions...")
         predictions = np.zeros((1, len(class_indices)))
         tta_datagen = ImageDataGenerator(
-            rotation_range=10, zoom_range=0.1, horizontal_flip=True, 
-            brightness_range=[0.9, 1.1], shear_range=0.1
+            rotation_range=20, zoom_range=0.2, width_shift_range=0.1,
+            height_shift_range=0.1, horizontal_flip=True,
+            brightness_range=[0.8, 1.2], shear_range=0.15
         )
-        img_array = preprocess_input(np.expand_dims(img_array, axis=0))
         for _ in range(tta_steps):
-            aug_gen = tta_datagen.flow(img_array, batch_size=1)
-            aug_img = next(aug_gen)
-            pred = model.predict(aug_img, verbose=0)
-            predictions += pred
+            aug_img = next(tta_datagen.flow(img_array, batch_size=1))
+            predictions += model.predict(aug_img, verbose=0)
         predictions /= tta_steps
-    
-    predicted_class_idx = np.argmax(predictions[0])
-    confidence = np.max(predictions[0])
-    predicted_class = [k for k, v in class_indices.items() if v == predicted_class_idx][0]
-    
-    return predicted_class, confidence, img
+
+    # Top-K predictions
+    top_indices = predictions[0].argsort()[-top_k:][::-1]
+    results = [(list(class_indices.keys())[i], predictions[0][i]) for i in top_indices]
+    return results, img
 
 def main():
     print("🔮 Tunisian Sign Language Model Tester")
@@ -82,20 +79,24 @@ def main():
     use_tta = input("Use TTA for better new image accuracy? (y/n): ").strip().lower() in ['y', 'yes']
     
     try:
-        predicted_class, confidence, img = predict_image(model, class_indices, img_path, tta=use_tta)
+        results, img = predict_image(model, class_indices, img_path, tta=use_tta)
         
         # Visualize
         plt.figure(figsize=(8, 6))
         plt.imshow(img)
-        plt.title(f"Predicted: {predicted_class}\nConfidence: {confidence:.2%}", fontsize=16, pad=20)
+        title_text = "\n".join([f"{cls}: {conf:.2%}" for cls, conf in results])
+        plt.title(f"Predictions:\n{title_text}", fontsize=16, pad=20)
         plt.axis('off')
         plt.show()
         
-        print(f"\n🎯 Predicted: {predicted_class} (confidence: {confidence:.2%}) {'[TTA]' if use_tta else ''}")
+        print("\n🎯 Top predictions:")
+        for cls, conf in results:
+            print(f"- {cls}: {conf:.2%}")
+        if use_tta:
+            print("✅ Predictions averaged with TTA")
         
     except Exception as e:
         print(f"❌ Error: {e}")
 
 if __name__ == "__main__":
     main()
-
