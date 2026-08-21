@@ -8,22 +8,6 @@ The system integrates **MediaPipe** for hand detection, supports ~57 classes, an
 ## 📸 Preview
 ![Sign Language Recognition Demo](https://images.unsplash.com/photo-1551240903-154be3f2e18b?q=80&w=1169&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D?q=80&w=1170&auto=format&fit=crop)
 
----
-
-## 📁 Project Structure
-.
-├── Data/raw/          # Training images by class (3aslema, 3ayla, etc.)
-├── models/            # tsl_model.h5 (trained)
-├── plots/             # Training curves
-├── main.py            # Train model
-├── predict.py         # Test on single image (terminal)
-├── app_gradio.py      # Web app — upload/photo → sign as text + voice
-├── hand_crop.py       # MediaPipe hand cropping (focus model on the hand)
-├── word_map.py        # Maps labels → Arabic phrases for voice (gTTS)
-├── requirements.txt   # Dependencies
-└── README.md          # This file
-
-Code
 
 ---
 
